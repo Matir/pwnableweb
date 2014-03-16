@@ -176,6 +176,11 @@ function start() {
       --error-logfile $DESTDIR/logs/scoreboard.error.log \
       -m 002 scoreboard.app:app
   fi
+  # Start clients
+  python $DESTDIR/pwntalk/client.py >$DESTDIR/logs/pwntalk.client.log 2>&1 &
+  echo \$! > /var/run/pwnableweb/pwntalk.client.pid
+  python $DESTDIR/pwncart/client.py >$DESTDIR/logs/pwncart.client.log 2>&1 &
+  echo \$! > /var/run/pwnableweb/pwncart.client.pid
 }
 
 function stop() {
@@ -218,8 +223,6 @@ $SCOREBOARD && (
   cp -n etc/scoreboard.nginx.conf /etc/nginx/sites-enabled/scoreboard.conf;
   sed -i -e "s|\\\$DOMAIN|$DOMAIN|g" -e "s|\\\$DESTDIR|$DESTDIR|g" \
     /etc/nginx/sites-enabled/scoreboard.conf )
-
-# TODO: Clients
 
 # Setup DBs
 export PYTHONPATH=$DESTDIR

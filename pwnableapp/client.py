@@ -1,3 +1,5 @@
+import os
+import sys
 import threading
 import time
 import xvfbwrapper
@@ -20,6 +22,9 @@ class VulnerableClient(object):
     self._stop_event = threading.Event()
     self._stop_event.clear()
     self._thread = None
+
+    # Get rid of stdin
+    os.close(sys.stdin.fileno())
 
   def __del__(self):
     # Attempt to shutdown xvfb and browser
