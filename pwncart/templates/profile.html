@@ -11,6 +11,11 @@
           <td><b>Email</b></td>
           <td>{{user.email}}</td>
         </tr>
+        {% if user.credit %}
+        <tr>
+          <td><b>Credit</b></td>
+          <td>{{user.credit}}</td>
+        </tr>
       </table>
     </div>
   </div>
