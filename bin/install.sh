@@ -91,7 +91,7 @@ useradd -g pwnableweb -d $DESTDIR/pwntalk -s /bin/nologin -M pwntalk || \
 useradd -g pwnableweb -d $DESTDIR/sandbox -s /bin/nologin -M sandbox || \
   getent passwd sandbox
 $SCOREBOARD && ( useradd -g pwnableweb -d $DESTDIR/scoreboard -s /bin/nologin \
-  -M scorebard || \
+  -M scoreboard || \
   getent passwd scoreboard )
 
 # MySQL setup
@@ -117,6 +117,8 @@ SERVER_NAME='pwncart.${DOMAIN}'
 SECRET_KEY='`randkey`'
 SQLALCHEMY_DATABASE_URI='mysql://pwncart:${PCPASS}@localhost/pwncart'
 LOG_FILE='${DESTDIR}/logs/pwncart.app.log'
+DOWNLOAD_DIR='${DESTDIR}/pwncart/downloads'
+SANDBOX_DIR='${DESTDIR}/pwncart/chroot'
 CONFIGEOF
 cat >pwntalk/config.py <<CONFIGEOF
 SERVER_NAME='pwntalk.${DOMAIN}'
@@ -233,9 +235,10 @@ $SCOREBOARD && (
 
 # Setup DBs
 export PYTHONPATH=$DESTDIR
-su -c "python pwntalk/main.py createdb" pwntalk
-su -c "python pwncart/main.py createdb" pwncart
-$SCOREBOARD && su -c "python scoreboard/main.py createdb" scoreboard
+su -s /bin/bash -c "source bin/activate;python pwntalk/main.py createdb" pwntalk
+su -s /bin/bash -c "source bin/activate;python pwncart/main.py createdb" pwncart
+$SCOREBOARD && su -s /bin/bash -c \
+  "source bin/activate;python scoreboard/main.py createdb" scoreboard
 
 # Start things
 /etc/init.d/pwnableweb start
