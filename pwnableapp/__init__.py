@@ -8,7 +8,7 @@ class Flask(flask.Flask):
     if not self.debug:
       handler = logging.FileHandler(
           self.config.get('LOG_FILE', '/tmp/flask.log'))
-      handler.setFormatter(
-          '%(asctime)s %(levelname)8s [%(filename)s:%(lineno)d] %(message)s')
+      handler.setFormatter(logging.Formatter(
+          '%(asctime)s %(levelname)8s [%(filename)s:%(lineno)d] %(message)s'))
       handler.setLevel(logging.INFO)
       self.logger.addHandler(handler)
