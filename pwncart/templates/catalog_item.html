@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{item.name}}{% endblock %}
+{% block body %}
+<div class='row'>
+  <div class='col-md-3 center'>
+    <img src='{{item.imgurl()}}'>
+  </div>
+  <div class='col-md-6'>
+    <div class='well well-sm'>
+      {{item.description}}
+    </div>
+    <h3>Comments</h3>
+    <div class='well well-sm'>
+      {% if comments %}
+        {% for c in comments %}
+          <div>
+            <b>{{c.username}}</b>
+            <p>{{c.comment}}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+      No comments.
+      {% endif %}
+      <form method='post' action='{{url_for('comment', item=item.catno)}}'>
+        <div class='form-group'>
+          <label for='add-comment'>Add Comment</label>
+          <textarea name='comment' id='add-comment' class='form-control'></textarea>
+          <input type='submit' value='Add Comment' class='btn btn-secondary'>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class='col-md-3 center'>
+    ${{item.price}}
+    <form method='post' action='{{url_for('shopping_cart')}}'>
+      <input type='hidden' name='add' value='{{item.catno}}'>
+      <input type='submit' value='Add to Cart' class='btn btn-primary'>
+    </form>
+  </div>
+</div>
+{% endblock %}

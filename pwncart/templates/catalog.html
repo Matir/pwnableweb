@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block body %}
+  {% for row in items|batch(3) %}
+    <div class='row'>
+      {% for item in row %}
+        <div class='col-md-4 catalog-item'>
+          {% if item %}
+            {% with item_link = url_for('catalog_item', item=item.catno) %}
+            <a href='{{item_link}}'><img src='{{item.imgurl()}}'
+              class='product-image' /></a>
+            <a href='{{item_link}}'>{{item.name}}</a>
+            {% endwith %}
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+{% endblock %}

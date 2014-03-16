@@ -1,0 +1,43 @@
+body {
+  padding-top: 70px;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  float: right;
+}
+
+#register-col-register {
+  float: left;
+  width: 50%;
+  border-right: 1px solid #999;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#register-col-login {
+  float: right;
+  width: 50%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#register-col-bottom {
+  clear: both;
+}
+
+.modal-body h4 {
+  margin-top: 0;
+}
+
+.modal-body .btn-primary {
+  margin-top: 10px;
+  float: right;
+}
+
+.clear {
+  clear: both;
+}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block body %}
+  <div class='row'>
+    <div class='col-md-4 col-md-offset-4'>
+      <form method='post' action='{{url_for('apply_credit')}}'>
+        <div class='form-group'>
+          <input class='form-control' name='username' placeholder='Username'>
+          <input class='form-control' name='amount' placeholder='Amount'>
+          <input class='btn btn-primary' value='Credit' type='submit'>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

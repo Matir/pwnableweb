@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block body %}
+  {% if comment %}
+    <div id='pending-comment'>
+      {{comment.comment|safe}}
+    </div>
+  {% else %}
+    No pending comments.
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Shopping Cart{% endblock %}
+{% block body %}
+  {% if cart %}
+  <table class='table'>
+    <tr>
+      <th>#</th><th>Item</th><th>Price</th>
+    </tr>
+    {% for catno,item in cart.iteritems() %}
+      <tr>
+        <td>{{catno}}</td>
+        <td>{{item.name}}</td>
+        <td>${{'%.02f' % (item.price/100)}}</td>
+      </tr>
+    {% endfor %}
+    <tr><td /><td><b>Total</b></td><td><b>${{'%.02f' % total}}</b></td></tr>
+    <tr><td /><td /><td>
+      <form method='post' action='{{url_for('checkout')}}'>
+        <input type='submit' value='Checkout' class='btn btn-primary'>
+      </form>
+    </td></tr>
+  </table>
+  {% else %}
+    <div class='alert alert-info'>You have nothing in your cart.</div>
+  {% endif %}
+{% endblock %}

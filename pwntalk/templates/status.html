@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block body %}
+<div class='row'>
+  <div class='col-md-3'>
+    <div class='list-group'>
+      <a href='?page=uptime' class='list-group-item'>Uptime</a>
+      <a href='?page=ps%20-ef' class='list-group-item'>Proccess</a>
+      <a href='?page=free' class='list-group-item'>Memory</a>
+    </div>
+  </div>
+  <div class='col-md-9'>
+    <pre>{{output}}</pre>
+  </div>
+</div>
+{% endblock %}

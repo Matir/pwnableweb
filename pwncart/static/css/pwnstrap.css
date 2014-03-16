@@ -1,0 +1,15 @@
+body {
+  padding-top: 70px;
+}
+
+.catalog-item {
+  text-align: center
+}
+
+.catalog-item a {
+  display: block;
+}
+
+.center {
+  text-align: center;
+}

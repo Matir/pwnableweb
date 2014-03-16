@@ -1,0 +1,2 @@
+User-agent: Hackers
+Disallow: /apply_credit

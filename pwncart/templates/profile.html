@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block body %}
+  <div class='row'>
+    <div class='col-md-4 col-md-offset-4'>
+      <table class='table'>
+        <tr>
+          <td><b>Username</b></td>
+          <td>{{user.username}}</td>
+        </tr>
+        <tr>
+          <td><b>Email</b></td>
+          <td>{{user.email}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+{% endblock %}

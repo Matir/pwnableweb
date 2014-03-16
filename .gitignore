@@ -1,0 +1,5 @@
+*.pyc
+*.swp
+*.db
+config.py
+pwntalk/tools/cmdwrapper

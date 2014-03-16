@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block body %}
+<div class='row'>
+<div class='col-md-6'>
+  <form method='post' action='{{url_for('register')}}'>
+    <h2>Register</h2>
+    <div class='form-group'>
+      <input name='username' class='form-control' placeholder='Username'>
+      <input name='email' class='form-control' placeholder='email'>
+      <input name='password' class='form-control' placeholder='password'
+      type='password'>
+      <input type='submit' value='Register'>
+    </div>
+  </form>
+</div>
+<div class='col-md-6'>
+  <form method='post' action='{{url_for('login')}}'>
+    <h2>Login</h2>
+    <div class='form-group'>
+      <input name='username' class='form-control' placeholder='Username'>
+      <input name='password' class='form-control' placeholder='password'
+      type='password'>
+      <input type='submit' value='Login'>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}
