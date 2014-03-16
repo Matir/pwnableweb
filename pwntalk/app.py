@@ -1,8 +1,8 @@
-import flask
 import hashlib
+import pwnableapp
 
 
-app = flask.Flask(__name__)
+app = pwnableapp.Flask('pwntalk')
 app.config.from_object('pwntalk.config')
 
 # CTF Flags

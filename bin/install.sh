@@ -83,6 +83,7 @@ pip install flask sqlalchemy Flask-SQLAlchemy MySQL-python selenium \
 
 # Setup users and groups
 groupadd -f pwnableweb
+usermod -a -G pwnableweb www-data
 useradd -g pwnableweb -d $DESTDIR/pwncart -s /bin/nologin -M pwncart || \
   getent passwd pwncart
 useradd -g pwnableweb -d $DESTDIR/pwntalk -s /bin/nologin -M pwntalk || \
@@ -135,8 +136,8 @@ chown -R pwntalk $DESTDIR/pwntalk
 chown -R sandbox $DESTDIR/sandbox
 $SCOREBOARD && chown -R scoreboard $DESTDIR/scoreboard
 chmod -R ug-w,o-rwx $DESTDIR
-chmod -R u-w,go-rwx $DESTDIR/pwncart
-chmod -R u-w,go-rwx $DESTDIR/pwntalk
+chmod -R u-w,g-rw,o-rwx $DESTDIR/{pwncart,pwntalk}
+chmod -R g+rX $DESTDIR/{pwncart,pwntalk}/static
 chmod -R ug-w,o-rwx $DESTDIR/sandbox
 chmod 4550 $DESTDIR/sandbox/cmdwrapper
 $SCOREBOARD && chmod -R u-w,go-rwx $DESTDIR/scoreboard
@@ -161,18 +162,18 @@ function start() {
     -w 4 -D -u pwncart -g pwnableweb -p /var/run/pwnableweb/pwncart.pid \
     --access-logfile $DESTDIR/logs/pwncart.access.log \
     --error-logfile $DESTDIR/logs/pwncart.error.log \
-    -m 002 pwncart.app:app
+    -m 007 pwncart.app:app
   bin/gunicorn -b 'unix:/var/run/pwnableweb/pwntalk.sock' \
     -w 4 -D -u pwntalk -g pwnableweb -p /var/run/pwnableweb/pwntalk.pid \
     --access-logfile $DESTDIR/logs/pwntalk.access.log \
     --error-logfile $DESTDIR/logs/pwntalk.error.log \
-    -m 002 pwntalk.app:app
+    -m 007 pwntalk.app:app
   if $SCOREBOARD ; then
     bin/gunicorn -b 'unix:/var/run/pwnableweb/scoreboard.sock' \
       -w 4 -D -u scoreboard -g pwnableweb -p /var/run/pwnableweb/scoreboard.pid \
       --access-logfile $DESTDIR/logs/scoreboard.access.log \
       --error-logfile $DESTDIR/logs/scoreboard.error.log \
-      -m 002 scoreboard.app:app
+      -m 007 scoreboard.app:app
   fi
   # Start clients
   python $DESTDIR/pwntalk/client.py >$DESTDIR/logs/pwntalk.client.log 2>&1 &
@@ -214,6 +215,8 @@ chmod 700 /etc/init.d/pwnableweb
 update-rc.d pwnableweb defaults
 
 # Nginx setup
+sed -i -r 's/^(\s*user\s+[A-Za-z0-9-]+).*$/\1 pwnableweb;/' \
+  /etc/nginx/nginx.conf
 cp -n etc/pwnableweb.nginx.conf /etc/nginx/sites-enabled/pwnableweb.conf
 sed -i -e "s|\\\$DOMAIN|$DOMAIN|g" -e "s|\\\$DESTDIR|$DESTDIR|g" \
   /etc/nginx/sites-enabled/pwnableweb.conf

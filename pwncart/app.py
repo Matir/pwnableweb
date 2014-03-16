@@ -1,9 +1,10 @@
-import flask
+import pwnableapp
 import hashlib
 
 
-app = flask.Flask(__name__)
+app = pwnableapp.Flask('pwncart')
 app.config.from_object('pwncart.config')
+app.init_logging()
 
 # CTF Flags
 flags = {
