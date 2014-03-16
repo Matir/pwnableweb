@@ -3,7 +3,7 @@ import hashlib
 
 
 app = flask.Flask(__name__)
-app.config.from_object('config')
+app.config.from_object('pwncart.config')
 
 # CTF Flags
 flags = {
