@@ -108,6 +108,7 @@ def create_data():
   item.description = 'Your very own Gibson, now in a laptop!'
   item.price = 915.95
   item.img_name = 'gibson.jpg'
+  item.attachment = 'Brochure.pdf'
   db.session.add(item)
   item = Item()
   item.catno = 1057

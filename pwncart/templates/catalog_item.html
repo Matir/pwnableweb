@@ -7,7 +7,11 @@
   </div>
   <div class='col-md-6'>
     <div class='well well-sm'>
-      {{item.description}}
+      <p>{{item.description}}</p>
+      {% if item.attachment %}
+      <a href='{{url_for('download')}}?file={{
+        item.attachment}}'>{{item.attachment}}</a>
+      {% endif %}
     </div>
     <h3>Comments</h3>
     <div class='well well-sm'>
