@@ -55,9 +55,7 @@ EOFSELECTIONS
 apt-get -y install python-pip python-dev mysql-server libmysqlclient-dev xvfb \
   curl unzip build-essential nginx
 curl -s -o /tmp/chrome.deb $CHROME
-dpkg -i /tmp/chrome.deb
-# In case of missing deps
-apt-get -fy install
+dpkg -i /tmp/chrome.deb && apt-get -fy install
 curl -s -o /tmp/chromedriver.zip $DRIVER
 unzip -d /tmp /tmp/chromedriver.zip
 mkdir -p `dirname $DRIVERDEST`
