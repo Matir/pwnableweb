@@ -55,7 +55,7 @@ EOFSELECTIONS
 apt-get -y install python-pip python-dev mysql-server libmysqlclient-dev xvfb \
   curl unzip build-essential nginx
 curl -s -o /tmp/chrome.deb $CHROME
-dpkg -i /tmp/chrome.deb && apt-get -fy install
+dpkg -i /tmp/chrome.deb || apt-get -fy install
 curl -s -o /tmp/chromedriver.zip $DRIVER
 unzip -d /tmp /tmp/chromedriver.zip
 mkdir -p `dirname $DRIVERDEST`
@@ -72,7 +72,7 @@ set -o nounset
 # Copy over
 cp -rn `dirname $0`/.. $DESTDIR
 cd $DESTDIR
-mkdir sandbox
+mkdir -p sandbox
 
 # Build sandbox binary
 gcc -o sandbox/cmdwrapper pwntalk/tools/cmdwrapper.c
@@ -134,12 +134,14 @@ CHALLENGELOG='${DESTDIR}/logs/challenge.log'
 CONFIGEOF
 
 # Set permissions
+mkdir -p $DESTDIR/logs
 chgrp -R pwnableweb $DESTDIR
 chown -R pwncart $DESTDIR/pwncart
 chown -R pwntalk $DESTDIR/pwntalk
 chown -R sandbox $DESTDIR/sandbox
 $SCOREBOARD && chown -R scoreboard $DESTDIR/scoreboard
 chmod -R ug-w,o-rwx $DESTDIR
+chmod 770 $DESTDIR/logs
 chmod -R u-w,g-rw,o-rwx $DESTDIR/{pwncart,pwntalk}
 chmod -R g+rX $DESTDIR/{pwncart,pwntalk}/static
 chmod -R ug-w,o-rwx $DESTDIR/sandbox
@@ -231,9 +233,9 @@ $SCOREBOARD && (
 
 # Setup DBs
 export PYTHONPATH=$DESTDIR
-python pwntalk/main.py createdb
-python pwncart/main.py createdb
-$SCOREBOARD && python scoreboard/main.py createdb
+su -c "python pwntalk/main.py createdb" pwntalk
+su -c "python pwncart/main.py createdb" pwncart
+$SCOREBOARD && su -c "python scoreboard/main.py createdb" scoreboard
 
 # Start things
 /etc/init.d/pwnableweb start
