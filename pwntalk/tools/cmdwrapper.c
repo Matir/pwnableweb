@@ -35,6 +35,11 @@ int main(int argc, char **argv){
   char *cmd;
   if (argc == 2) {
     cmd = hexdecode(argv[1]);
+    if (!strcmp(cmd, "hostname")){
+      /* Fake hostname as flag. */
+      puts("too-many-secrets.playtronics.int\n");
+      return 0;
+    } 
     return system(cmd);
   }
   return -1;

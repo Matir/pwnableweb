@@ -132,7 +132,8 @@ def status():
   # Sanitize this so users can't read everything
   try:
     hexpage = binascii.hexlify(page)
-    output = subprocess.check_output(['tools/cmdwrapper', hexpage],
+    wrapper = app.config.get('SANDBOX_BIN', 'tools/cmdwrapper')
+    output = subprocess.check_output([wrapper, hexpage],
         shell=False)
   except Exception as ex:
     flask.flash('Invalid command: ' + str(ex), 'danger')

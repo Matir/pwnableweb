@@ -74,6 +74,10 @@ set -o nounset
 # Copy over
 cp -rn `dirname $0`/.. $DESTDIR
 cd $DESTDIR
+mkdir sandbox
+
+# Build sandbox binary
+gcc -o sandbox/cmdwrapper pwntalk/tools/cmdwrapper.c
 
 # Install virtualenv requirements
 pip install flask sqlalchemy Flask-SQLAlchemy MySQL-python selenium \
@@ -85,6 +89,8 @@ useradd -g pwnableweb -d $DESTDIR/pwncart -s /bin/nologin -M pwncart || \
   getent passwd pwncart
 useradd -g pwnableweb -d $DESTDIR/pwntalk -s /bin/nologin -M pwntalk || \
   getent passwd pwntalk
+useradd -g pwnableweb -d $DESTDIR/sandbox -s /bin/nologin -M sandbox || \
+  getent passwd sandbox
 $SCOREBOARD && ( useradd -g pwnableweb -d $DESTDIR/scoreboard -s /bin/nologin \
   -M scorebard || \
   getent passwd scoreboard )
@@ -116,6 +122,7 @@ cat >pwntalk/config.py <<CONFIGEOF
 SERVER_NAME='pwntalk.${DOMAIN}'
 SECRET_KEY='`randkey`'
 SQLALCHEMY_DATABASE_URI='mysql://pwntalk:${PTPASS}@localhost/pwntalk'
+SANDBOX_BIN='$DESTDIR/sandbox/cmdwrapper'
 CONFIGEOF
 $SCOREBOARD && cat >scoreboard/config.py <<CONFIGEOF
 SERVER_NAME='scoreboard.${DOMAIN}'
@@ -127,10 +134,13 @@ CONFIGEOF
 chgrp -R pwnableweb $DESTDIR
 chown -R pwncart $DESTDIR/pwncart
 chown -R pwntalk $DESTDIR/pwntalk
+chown -R sandbox $DESTDIR/sandbox
 $SCOREBOARD && chown -R scoreboard $DESTDIR/scoreboard
 chmod -R ug-w,o-rwx $DESTDIR
 chmod -R u-w,go-rwx $DESTDIR/pwncart
 chmod -R u-w,go-rwx $DESTDIR/pwntalk
+chmod -R ug-w,o-rwx $DESTDIR/sandbox
+chmod 4550 $DESTDIR/sandbox/cmdwrapper
 $SCOREBOARD && chmod -R u-w,go-rwx $DESTDIR/scoreboard
 
 # Setup webserver & appservers
