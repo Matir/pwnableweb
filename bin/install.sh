@@ -116,17 +116,21 @@ cat >pwncart/config.py <<CONFIGEOF
 SERVER_NAME='pwncart.${DOMAIN}'
 SECRET_KEY='`randkey`'
 SQLALCHEMY_DATABASE_URI='mysql://pwncart:${PCPASS}@localhost/pwncart'
+LOG_FILE='${DESTDIR}/logs/pwncart.app.log'
 CONFIGEOF
 cat >pwntalk/config.py <<CONFIGEOF
 SERVER_NAME='pwntalk.${DOMAIN}'
 SECRET_KEY='`randkey`'
 SQLALCHEMY_DATABASE_URI='mysql://pwntalk:${PTPASS}@localhost/pwntalk'
 SANDBOX_BIN='$DESTDIR/sandbox/cmdwrapper'
+LOG_FILE='${DESTDIR}/logs/pwntalk.app.log'
 CONFIGEOF
 $SCOREBOARD && cat >scoreboard/config.py <<CONFIGEOF
 SERVER_NAME='scoreboard.${DOMAIN}'
 SECRET_KEY='`randkey`'
 SQLALCHEMY_DATABASE_URI='mysql://scoreboard:${SBPASS}@localhost/scoreboard'
+LOGFILE='${DESTDIR}/logs/scoreboard.app.log'
+CHALLENGELOG='${DESTDIR}/logs/challenge.log'
 CONFIGEOF
 
 # Set permissions
@@ -162,18 +166,18 @@ function start() {
     -w 4 -D -u pwncart -g pwnableweb -p /var/run/pwnableweb/pwncart.pid \
     --access-logfile $DESTDIR/logs/pwncart.access.log \
     --error-logfile $DESTDIR/logs/pwncart.error.log \
-    -m 007 pwncart.app:app
+    -m 007 pwncart.main:app
   bin/gunicorn -b 'unix:/var/run/pwnableweb/pwntalk.sock' \
     -w 4 -D -u pwntalk -g pwnableweb -p /var/run/pwnableweb/pwntalk.pid \
     --access-logfile $DESTDIR/logs/pwntalk.access.log \
     --error-logfile $DESTDIR/logs/pwntalk.error.log \
-    -m 007 pwntalk.app:app
+    -m 007 pwntalk.main:app
   if $SCOREBOARD ; then
     bin/gunicorn -b 'unix:/var/run/pwnableweb/scoreboard.sock' \
       -w 4 -D -u scoreboard -g pwnableweb -p /var/run/pwnableweb/scoreboard.pid \
       --access-logfile $DESTDIR/logs/scoreboard.access.log \
       --error-logfile $DESTDIR/logs/scoreboard.error.log \
-      -m 007 scoreboard.app:app
+      -m 007 scoreboard.main:app
   fi
   # Start clients
   python $DESTDIR/pwntalk/client.py >$DESTDIR/logs/pwntalk.client.log 2>&1 &
