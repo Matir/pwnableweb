@@ -19,6 +19,7 @@
             <ul class='nav navbar-nav'>
               <li><a href='/'>Home</a></li>
               {% if session.user %}
+              <li><a href='{{url_for('direct_messages')}}'>Direct Messages</a></li>
               <li><a href='{{url_for('user_page',
                 username=g.user.username)}}'>My Posts</a></li>
               <li><a href='/profile'>Profile</a></li>
@@ -113,6 +114,7 @@
               <h4 class="modal-title">New Post</h4>
             </div>
             <div class="modal-body">
+              <p>Start your post with @username to send a direct message.</p>
               <form method='POST' action='{{url_for('post')}}'
                   id='new-post-form'>
                 <input type='hidden' name='csrftoken' value='{{csrftoken}}'>

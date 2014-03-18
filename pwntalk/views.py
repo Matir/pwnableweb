@@ -3,6 +3,7 @@ import binascii
 import flask
 import functools
 import hashlib
+import re
 from sqlalchemy import exc
 from sqlalchemy.orm import exc as orm_exc
 import subprocess
@@ -24,7 +25,8 @@ def require_login(func):
 @app.route('/')
 def home():
   _check_login()
-  return _render_posts_page(models.Post.query)
+  return _render_posts_page(
+      models.Post.query.filter(models.Post.recipient == None))
 
 
 @app.route('/login', methods=['POST'])
@@ -74,7 +76,7 @@ def profile():
     models.commit()
     flask.flash('Profile updated.', 'success')
     # Check for flag
-    if user.username == 'root' and flask.g.user.username in user.tagline:
+    if user.username == 'root' and flask.g.user.username in user.tagline.split():
       flag = get_flag('user_profile_edited')
   return _render_page('profile.html', flag=flag, user=flask.g.user)
 
@@ -89,7 +91,16 @@ def post():
   elif len(text) > 200:
     flask.flash('Text cannot be more than 200 characters.', 'warning')
   else:
-    models.Post.post(flask.g.user, text)
+    recipient = None
+    match = re.match('@([A-Za-z0-9_-]+)', text)
+    if match:
+      try:
+        recipient = models.User.query.filter(
+            models.User.username == match.group(1)).one()
+      except:
+        flask.flash('Could not find user for DM.', 'warning')
+        return flask.redirect(flask.request.form['redir'])
+    models.Post.post(flask.g.user, text, recipient)
   return flask.redirect(flask.request.form['redir'])
 
 
@@ -104,9 +115,16 @@ def user_page(username):
     user = None
   if not user:
     flask.flash('No such user!', 'warning')
-    return _render_page('error.html')
-  posts = user.posts
+    return flask.make_response(_render_page('error.html'), 404)
+  posts = user.posts.filter(models.Post.recipient_id == None)
   return _render_posts_page(posts, user_profile=user)
+
+
+@app.route('/direct_messages')
+@require_login
+def direct_messages():
+  posts = models.Post.query.filter(models.Post.recipient == flask.g.user)
+  return _render_posts_page(posts, user_profile=flask.g.user)
 
 
 @app.route('/status', methods=['GET', 'POST'])
@@ -153,10 +171,9 @@ def _render_posts_page(posts, **kwargs):
     posts = posts.order_by(models.Post.posted.desc()).limit(20)
     # Check for win
     if 'user' in flask.g:
-      username = flask.g.user.username
       for post in posts:
         if (post.author.username == 'HaplessTechnoweenie' and 
-            username in post.text):
+            post.recipient == flask.g.user):
           flag = get_flag('dom_based_xss')
     # TODO: pagination?
   return _render_page(

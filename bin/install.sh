@@ -115,7 +115,7 @@ unset PERMS
 cat >pwncart/config.py <<CONFIGEOF
 SERVER_NAME='pwncart.${DOMAIN}'
 SECRET_KEY='`randkey`'
-SQLALCHEMY_DATABASE_URI='mysql://pwncart:${PCPASS}@localhost/pwncart'
+SQLALCHEMY_DATABASE_URI='mysql://pwncart:${PCPASS}@localhost/pwncart?charset=utf8'
 LOG_FILE='${DESTDIR}/logs/pwncart.app.log'
 DOWNLOAD_DIR='${DESTDIR}/pwncart/downloads'
 SANDBOX_DIR='${DESTDIR}/pwncart/chroot'
@@ -124,14 +124,14 @@ CONFIGEOF
 cat >pwntalk/config.py <<CONFIGEOF
 SERVER_NAME='pwntalk.${DOMAIN}'
 SECRET_KEY='`randkey`'
-SQLALCHEMY_DATABASE_URI='mysql://pwntalk:${PTPASS}@localhost/pwntalk'
+SQLALCHEMY_DATABASE_URI='mysql://pwntalk:${PTPASS}@localhost/pwntalk?charset=utf8'
 SANDBOX_BIN='$DESTDIR/sandbox/cmdwrapper'
 LOG_FILE='${DESTDIR}/logs/pwntalk.app.log'
 CONFIGEOF
 $SCOREBOARD && cat >scoreboard/config.py <<CONFIGEOF
 SERVER_NAME='scoreboard.${DOMAIN}'
 SECRET_KEY='`randkey`'
-SQLALCHEMY_DATABASE_URI='mysql://scoreboard:${SBPASS}@localhost/scoreboard'
+SQLALCHEMY_DATABASE_URI='mysql://scoreboard:${SBPASS}@localhost/scoreboard?charset=utf8'
 LOGFILE='${DESTDIR}/logs/scoreboard.app.log'
 CHALLENGELOG='${DESTDIR}/logs/challenge.log'
 CONFIGEOF

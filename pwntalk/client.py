@@ -21,8 +21,9 @@ class PwnTalkClient(client.VulnerableClient):
   
   def run(self):
     with app.app_context():
-      url = url_for('home', _external=True)
+      url = url_for('direct_messages', _external=True)
     print 'Loading %s' % url
+    self.browser.get('about:blank')
     self.browser.get(url)
     try:
       self.browser.find_element_by_id('new-post-form')
@@ -50,14 +51,12 @@ class PwnTalkClient(client.VulnerableClient):
     """Visit links offered by page."""
     links = self.browser.find_elements_by_css_selector(
         '#post-wrapper .panel-body a')
-    urls = []
-    for link in links:
-      url = link.get_attribute('href')
+    urls = [link.get_attribute('href') for link in links]
+    for url in urls:
       if url in self.visited:
         continue
-      urls.append(url)
-    for url in urls:
       print 'Loading %s' % url
+      self.browser.get('about:blank')
       self.browser.get(url)
       self.visited.add(url)
       # Better make their attacks fast!

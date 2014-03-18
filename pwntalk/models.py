@@ -20,6 +20,11 @@ class User(db.Model):
   tagline = db.Column(db.String(200))
   posts = db.relationship('Post',
       backref=db.backref('author', lazy='joined'),
+      foreign_keys='Post.author_id',
+      lazy='dynamic')
+  dms = db.relationship('Post',
+      backref=db.backref('recipient', lazy='joined'),
+      foreign_keys='Post.recipient_id',
       lazy='dynamic')
 
   @classmethod
@@ -37,14 +42,17 @@ class User(db.Model):
 class Post(db.Model):
   pid = db.Column(db.Integer, primary_key=True)
   author_id = db.Column(db.Integer, db.ForeignKey('user.uid'))
+  recipient_id = db.Column(db.Integer, db.ForeignKey('user.uid'))
   posted = db.Column(db.DateTime, default=datetime.datetime.utcnow)
   text = db.Column(db.String(200))
 
   @classmethod
-  def post(cls, author, text):
+  def post(cls, author, text, recipient=None):
     p = cls()
     p.author = author
     p.text = text
+    if recipient:
+      p.recipient = recipient
     db.session.add(p)
     db.session.commit()
     return p
