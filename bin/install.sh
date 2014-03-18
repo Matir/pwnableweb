@@ -226,6 +226,8 @@ update-rc.d pwnableweb defaults
 # Nginx setup
 sed -i -r 's/^(\s*user\s+[A-Za-z0-9-]+).*$/\1 pwnableweb;/' \
   /etc/nginx/nginx.conf
+sed -i -r 's/^(\s*)(#\s*)?(server_names_hash_bucket_size\s+).*$/\1\364;/' \
+  /etc/nginx/nginx.conf
 cp -n etc/pwnableweb.nginx.conf /etc/nginx/sites-enabled/pwnableweb.conf
 sed -i -e "s|\\\$DOMAIN|$DOMAIN|g" -e "s|\\\$DESTDIR|$DESTDIR|g" \
   /etc/nginx/sites-enabled/pwnableweb.conf
