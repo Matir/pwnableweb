@@ -119,6 +119,7 @@ SQLALCHEMY_DATABASE_URI='mysql://pwncart:${PCPASS}@localhost/pwncart'
 LOG_FILE='${DESTDIR}/logs/pwncart.app.log'
 DOWNLOAD_DIR='${DESTDIR}/pwncart/downloads'
 SANDBOX_DIR='${DESTDIR}/pwncart/chroot'
+ADMIN_TOKEN='`randkey`'
 CONFIGEOF
 cat >pwntalk/config.py <<CONFIGEOF
 SERVER_NAME='pwntalk.${DOMAIN}'

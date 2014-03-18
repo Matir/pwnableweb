@@ -25,7 +25,11 @@ def require_admin(func):
   """Require admin on post."""
   @functools.wraps(func)
   def _admin_wrapper():
-    if request.cookies.get('admin') != app.config['ADMIN_TOKEN']:
+    admin_cookie = request.cookies.get('admin')
+    expected = app.config['ADMIN_TOKEN']
+    if admin_cookie != expected:
+      app.logger.warning('Admin token failure, expected %s, got %s' % 
+          (expected, admin_cookie))
       flask.abort(403)
     else:
       return func()
@@ -158,7 +162,7 @@ def profile():
 
 
 @app.route('/review_comments')
-#@require_admin
+@require_admin
 def review_comments():
   comment = models.Comment.query.filter(models.Comment.reviewed ==
       False).first()
@@ -192,14 +196,14 @@ def apply_credit():
 def _apply_credit_post():
   username = request.values.get('username')
   user = models.User.query.get_or_404(username)
-  user.credit += request.values.get('amount', 0)
+  user.credit += int(request.values.get('amount', 0))
   models.db.session.commit()
   flask.flash('Credit applied.', 'success')
 
 
 @app.route('/robots.txt')
 def robots():
-  return flask.render_template(flask.url_for('static', filename='robots.txt'))
+  return app.send_static_file('robots.txt')
 
 
 @app.route('/download')
@@ -214,13 +218,16 @@ def download():
   path = join_paths(app.config['DOWNLOAD_DIR'], path)
   if path.startswith(app.config['DOWNLOAD_DIR']):
     if not os.path.isfile(path):
+      app.logger.warning('Download not in DIR requested: %s' % path)
       flask.abort(403)
     return flask.send_file(path)
   # Now fake chroot
   path = join_paths(app.config['SANDBOX_DIR'], path)
   # Double check
   if not path.startswith(app.config['SANDBOX_DIR']):
+    app.logger.warning('Download not in sandbox requested: %s' % path)
     flask.abort(500)
   if not os.path.isfile(path):
+    app.logger.warning('Download not found: %s' % path)
     flask.abort(404)
   return flask.send_file(path)

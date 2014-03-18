@@ -10,7 +10,7 @@ class User(db.Model):
   username = db.Column(db.String(100), primary_key=True)
   email = db.Column(db.String(100), unique=True)
   pwhash = db.Column(db.String(100))
-  credit = db.Column(db.Numeric(8, 2))
+  credit = db.Column(db.Numeric(8, 2), default=0)
   orders = db.relationship('Order', backref='user', lazy='dynamic')
   comments = db.relationship('Comment', backref='user', lazy='dynamic')
 
