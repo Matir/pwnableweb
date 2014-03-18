@@ -27,7 +27,7 @@ $(document).ready(function() {
     if (parts.length != 2)
       return;
     if (parts[0] == 'postbox')
-      showmodal(parts[1]);
+      showmodal(decodeURIComponent(parts[1]));
   });
 });
 
