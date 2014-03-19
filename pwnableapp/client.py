@@ -1,4 +1,5 @@
 import os
+import signal
 import sys
 import threading
 import time
@@ -26,6 +27,10 @@ class VulnerableClient(object):
     # Get rid of stdin
     os.close(sys.stdin.fileno())
 
+    # Signals
+    for sig in (signal.SIGINT, signal.SIGQUIT, signal.SIGTERM):
+      signal.signal(sig, self.stop)
+
   def __del__(self):
     # Attempt to shutdown xvfb and browser
     try:
@@ -35,6 +40,14 @@ class VulnerableClient(object):
         self.xvfb.stop()
     except AttributeError:
       pass
+
+  def stop(self, *unused_args):
+    self._stop_event.set()
+    self._thread.join()
+    self.browser.quit()
+    self.browser = None
+    self.xvfb.stop()
+    self.xvfb = None
 
   def start(self, check_interval=60):
     """Manage running the run() function.
@@ -50,12 +63,7 @@ class VulnerableClient(object):
         self._run_event.set()
     except KeyboardInterrupt:
       print 'Saw CTRL-C, shutting down.'
-      self._stop_event.set()
-      self._thread.join()
-      self.browser.quit()
-      self.browser = None
-      self.xvfb.stop()
-      self.xvfb = None
+      self.stop()
 
   def _wrap_run(self):
     """Run in a separate thread."""
