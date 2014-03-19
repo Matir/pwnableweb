@@ -13,7 +13,7 @@ class PwnCartClient(client.VulnerableClient):
     if ('chromedriver_path' not in kwargs and 
         'chromedriver_path' in app.config):
       kwargs['chromedriver_path'] = app.config['chromedriver_path']
-    super(PwnCartClient, self).__init__(**kwargs)
+    super(PwnCartClient, self).__init__('PwnCartClient', **kwargs)
   
   def run(self):
     with app.app_context():

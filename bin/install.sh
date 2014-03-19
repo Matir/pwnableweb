@@ -79,7 +79,7 @@ gcc -o sandbox/cmdwrapper pwntalk/tools/cmdwrapper.c
 
 # Install virtualenv requirements
 pip install flask sqlalchemy Flask-SQLAlchemy MySQL-python selenium \
-  xvfbwrapper pbkdf2 gunicorn
+  xvfbwrapper pbkdf2 gunicorn daemonize
 
 # Setup users and groups
 groupadd -f pwnableweb
@@ -185,10 +185,10 @@ function start() {
       -m 007 scoreboard.main:app
   fi
   # Start clients
-  python $DESTDIR/pwntalk/client.py >$DESTDIR/logs/pwntalk.client.log 2>&1 &
-  echo \$! > /var/run/pwnableweb/pwntalk.client.pid
-  python $DESTDIR/pwncart/client.py >$DESTDIR/logs/pwncart.client.log 2>&1 &
-  echo \$! > /var/run/pwnableweb/pwncart.client.pid
+  python $DESTDIR/pwntalk/client.py --user pwntalk --group pwnableweb \
+    --pidfile /var/run/pwnableweb/pwntalk.client.pid
+  python $DESTDIR/pwncart/client.py --user pwncart --group pwnableweb \
+    --pidfile /var/run/pwnableweb/pwncart.client.pid
 }
 
 function stop() {

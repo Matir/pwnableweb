@@ -1,3 +1,5 @@
+import argparse
+import daemonize
 import os
 import signal
 import sys
@@ -14,40 +16,62 @@ class VulnerableClient(object):
   Runs Chrome inside XVFB.  Only need to override run().
   """
 
-  def __init__(self, chromedriver_path='chromedriver'):
+  def __init__(self, name, chromedriver_path='chromedriver'):
+    # Setup objects
+    self._run_event = threading.Event()
+    self._stop_event = threading.Event()
+    self._thread = None
+    self._chromedriver_path = chromedriver_path
+    self._daemon = None
+    self._name = name
+
+    # Parse config
+    self._config = self._parse_config()
+    if self._config.daemon:
+      user = self._config.user if os.geteuid() == 0 else None
+      group = self._config.group if os.geteuid() == 0 else None
+      self._daemon = daemonize.Daemonize(
+          name,
+          pid=self._config.pidfile,
+          action=self._start_internal,
+          user=user,
+          group=group)
+
+    # Setup the browser & xvfb
     self.xvfb = xvfbwrapper.Xvfb(width=1024, height=768)
     self.xvfb.start()
-    self.browser = webdriver.Chrome(executable_path=chromedriver_path)
-    self._run_event = threading.Event()
+    self.browser = webdriver.Chrome(executable_path=self._chromedriver_path)
     self._run_event.set()
-    self._stop_event = threading.Event()
     self._stop_event.clear()
-    self._thread = None
 
-    # Get rid of stdin
-    os.close(sys.stdin.fileno())
-
-    # Signals
-    for sig in (signal.SIGINT, signal.SIGQUIT, signal.SIGTERM):
-      signal.signal(sig, self.stop)
+  def _parse_config(self):
+    parser = argparse.ArgumentParser(description='Vulnerable Client')
+    parser.add_argument('--user', help='Drop privileges to this user.',
+        default='nobody')
+    parser.add_argument('--group', help='Drop privileges to this group.',
+        default='nogroup')
+    parser.add_argument('--nodaemon', help='Daemonize.', action='store_false',
+        dest='daemon')
+    parser.add_argument('--pidfile', help='Write pid to file.',
+        default='/tmp/%s.pid' % self._name)
+    return parser.parse_args()
 
   def __del__(self):
     # Attempt to shutdown xvfb and browser
-    try:
-      if self.browser:
-        self.browser.quit()
-      if self.xvfb:
-        self.xvfb.stop()
-    except AttributeError:
-      pass
+    self.stop()
 
   def stop(self, *unused_args):
-    self._stop_event.set()
-    self._thread.join()
-    self.browser.quit()
-    self.browser = None
-    self.xvfb.stop()
-    self.xvfb = None
+    try:
+      self._stop_event.set()
+      if self._thread:
+        self._thread.join()
+      self.browser.quit()
+      self.browser = None
+      self.xvfb.stop()
+      self.xvfb = None
+    except AttributeError:
+      pass
+    sys.exit(0)
 
   def start(self, check_interval=60):
     """Manage running the run() function.
@@ -55,11 +79,22 @@ class VulnerableClient(object):
     Calls run at check_interval seconds, unless run returns True, which
     reschedules it immediately.
     """
+    self._interval = check_interval
+    if self._daemon:
+      self._daemon.start()
+    else:
+      self._start_internal()
+
+  def _start_internal(self):
+    # Signals
+    for sig in (signal.SIGINT, signal.SIGQUIT, signal.SIGTERM):
+      signal.signal(sig, self.stop)
+
     self._thread = threading.Thread(target=self._wrap_run)
     self._thread.start()
     try:
       while True:
-        time.sleep(check_interval)
+        time.sleep(self._interval)
         self._run_event.set()
     except KeyboardInterrupt:
       print 'Saw CTRL-C, shutting down.'

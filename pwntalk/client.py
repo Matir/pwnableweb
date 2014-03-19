@@ -15,7 +15,7 @@ class PwnTalkClient(client.VulnerableClient):
     if ('chromedriver_path' not in kwargs and 
         'chromedriver_path' in app.config):
       kwargs['chromedriver_path'] = app.config['chromedriver_path']
-    super(PwnTalkClient, self).__init__(**kwargs)
+    super(PwnTalkClient, self).__init__(PwnTalkClient, **kwargs)
     # Setup
     self.visited = set()
   
