@@ -54,7 +54,11 @@ def catalog_item(item):
 @app.route('/cart', methods=['GET', 'POST'])
 @require_login
 def shopping_cart():
-  cart = json.loads(request.cookies.get('cart', '{}'))
+  try:
+    cart = json.loads(request.cookies.get('cart', '{}'))
+  except ValueError:
+    flask.flash('Invalid cart.', 'warning')
+    cart = {}
   total = _total_price(cart)
   if request.method == 'GET':
     return flask.render_template('cart.html', cart=cart, total=total)
@@ -113,12 +117,18 @@ def home():
 @app.route('/login', methods=['POST'])
 def login():
   """Login."""
-  user = models.User.login_user(request.form.get('username'),
-      request.form.get('password'))
-  if user:
-    session['user'] = user.username
-    return flask.redirect(flask.url_for('catalog'))
-  flask.flash('Invalid username/password.', 'danger')
+  username = request.form.get('username')
+  password = request.form.get('password')
+  if not user:
+    flask.flash('Username is required.', 'warning')
+  elif password is None:
+    flask.flash('Password is required.', 'warning')
+  else:
+    user = models.User.login_user(username, password)
+    if user:
+      session['user'] = user.username
+      return flask.redirect(flask.url_for('catalog'))
+    flask.flash('Invalid username/password.', 'danger')
   return flask.redirect(flask.url_for('home'))
 
 
@@ -137,7 +147,7 @@ def register():
     flask.flash(msg, 'danger')
     return flask.redirect(flask.url_for('home'))
 
-  username = request.form.get('username')
+  username = request.form.get('username', '')
   if not re.match(r'[A-Za-z0-9_]+$', username):
     return fail_validate('Invalid username.')
   if models.User.query.get(username):
@@ -146,7 +156,9 @@ def register():
   user = models.User()
   user.username = username
   user.password = request.form.get('password')
-  user.email = request.form.get('email')
+  user.email = request.form.get('email', '')
+  if models.User.query.filter(models.User.email == user.email).count():
+    return fail_validate('User exists with that email address.')
   models.db.session.add(user)
   models.db.session.commit()
   session['user'] = user.username

@@ -1,6 +1,7 @@
 import hashlib
 import flask
 from flask.ext import sqlalchemy
+from sqlalchemy import exc
 from pwncart.app import app
 
 db = sqlalchemy.SQLAlchemy(app)
@@ -31,9 +32,13 @@ class User(db.Model):
   @classmethod
   def login_user(cls, username, password):
     # Validate login, then get by username
-    res = db.engine.execute("select username from " + cls.__tablename__ + 
-        " where username='" + username + "' and pwhash='" +
-        cls.hash_password(password) + "'")
+    try:
+      res = db.engine.execute("select username from " + cls.__tablename__ + 
+          " where username='" + username + "' and pwhash='" +
+          cls.hash_password(password) + "'")
+    except exc.ProgrammingError:
+      flask.flash('SQL Error in login.', 'danger')
+      return None
     row = res.fetchone()
     if not row:
       return
