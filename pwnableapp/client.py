@@ -7,7 +7,7 @@ import threading
 import time
 import xvfbwrapper
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
+from selenium.common import exceptions
 
 
 class VulnerableClient(object):
@@ -110,7 +110,7 @@ class VulnerableClient(object):
         while self.run():
           if self._stop_event.is_set():
             break
-      except TimeoutException:
+      except exceptions.WebDriverException:
         continue
 
   def run(self):
