@@ -119,7 +119,7 @@ def login():
   """Login."""
   username = request.form.get('username')
   password = request.form.get('password')
-  if not user:
+  if not username:
     flask.flash('Username is required.', 'warning')
   elif password is None:
     flask.flash('Password is required.', 'warning')

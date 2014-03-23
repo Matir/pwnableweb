@@ -11,4 +11,5 @@ if __name__ == '__main__':
     models.db.create_all()
     models.create_data()
   else:
-    app.run(debug=True, port=app.config['PORT'])
+    #app.run(debug=True, port=app.config['PORT'])
+    app.run(debug=False, port=app.config['PORT'])

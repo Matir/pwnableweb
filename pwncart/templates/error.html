@@ -3,12 +3,10 @@
   {% if code == 500 %}
     Internal Server Error
   {% endif %}
+{% endblock %}
 {% block body %}
   {% if code == 500 %}
     An internal server error occurred.
-    {% if exc %}
-      Details:
-      <div class='well'>{% exc %}</div>
-    {% endif %}
+    <div class='well'>{{ message }}</div>
   {% endif %}
 {% endblock %}

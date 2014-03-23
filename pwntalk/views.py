@@ -71,7 +71,7 @@ def profile():
   if flask.request.method == 'POST':
     user = models.User.query.get(flask.request.form.get('uid'))
     if not user:
-      abort(404)
+      flask.abort(404)
     user.tagline = flask.request.form.get('tagline')
     models.commit()
     flask.flash('Profile updated.', 'success')
