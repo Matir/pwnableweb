@@ -3,7 +3,7 @@ set -o noclobber
 set -o errexit
 set -o nounset
 # For debugging
-set -o xtrace
+test -z ${DEBUG-} || set -o xtrace
 
 # Options
 DESTDIR=/opt/pwnableweb
@@ -79,7 +79,7 @@ gcc -o sandbox/cmdwrapper pwntalk/tools/cmdwrapper.c
 
 # Install virtualenv requirements
 pip install flask sqlalchemy Flask-SQLAlchemy MySQL-python selenium \
-  xvfbwrapper pbkdf2 gunicorn daemonize
+  xvfbwrapper pbkdf2 gunicorn daemonize python-dateutil
 
 # Setup users and groups
 groupadd -f pwnableweb
