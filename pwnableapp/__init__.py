@@ -1,5 +1,6 @@
 import logging
 import flask
+import os
 import sys
 
 class Flask(flask.Flask):
@@ -14,12 +15,15 @@ class Flask(flask.Flask):
   def init_logging(self):
     """Must be called after config setup."""
     if not self.debug:
+      old_umask = os.umask(0077)
       handler = logging.FileHandler(
           self.config.get('LOG_FILE', '/tmp/flask.log'))
       handler.setFormatter(logging.Formatter(
           '%(asctime)s %(levelname)8s [%(filename)s:%(lineno)d] %(message)s'))
       handler.setLevel(logging.INFO)
       self.logger.addHandler(handler)
+      self.logger.info('Logging started.')
+      os.umask(old_umask)
 
   def internal_error_handler(self, message=None):
     return flask.make_response(flask.render_template(
