@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 /* Simple hex decoder */
 char decode_intern(char c){
@@ -33,6 +35,7 @@ char *hexdecode(const char *in){
 
 int main(int argc, char **argv){
   char *cmd;
+  setreuid(geteuid(), geteuid());
   if (argc == 2) {
     cmd = hexdecode(argv[1]);
     if (!strcmp(cmd, "hostname")){
