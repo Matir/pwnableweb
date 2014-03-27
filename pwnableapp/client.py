@@ -24,6 +24,7 @@ class VulnerableClient(object):
     self._chromedriver_path = chromedriver_path
     self._daemon = None
     self._name = name
+    self._started = False
 
     # Parse config
     self._config = self._parse_config()
@@ -36,13 +37,6 @@ class VulnerableClient(object):
           action=self._start_internal,
           user=user,
           group=group)
-
-    # Setup the browser & xvfb
-    self.xvfb = xvfbwrapper.Xvfb(width=1024, height=768)
-    self.xvfb.start()
-    self.browser = webdriver.Chrome(executable_path=self._chromedriver_path)
-    self._run_event.set()
-    self._stop_event.clear()
 
   def _parse_config(self):
     parser = argparse.ArgumentParser(description='Vulnerable Client')
@@ -61,6 +55,8 @@ class VulnerableClient(object):
     self.stop()
 
   def stop(self, *unused_args):
+    if not self._started:
+      return
     try:
       self._stop_event.set()
       if self._thread:
@@ -86,9 +82,18 @@ class VulnerableClient(object):
       self._start_internal()
 
   def _start_internal(self):
+    self._started = True
     # Signals
     for sig in (signal.SIGINT, signal.SIGQUIT, signal.SIGTERM):
       signal.signal(sig, self.stop)
+
+    # Setup the browser & xvfb
+    self.xvfb = xvfbwrapper.Xvfb(width=1024, height=768)
+    self.xvfb.start()
+    self.browser = webdriver.Chrome(executable_path=self._chromedriver_path)
+    self._run_event.set()
+    self._stop_event.clear()
+
 
     self._thread = threading.Thread(target=self._wrap_run)
     self._thread.start()
