@@ -18,6 +18,7 @@ import pwnableapp
 
 app = pwnableapp.Flask('pwntalk')
 app.config.from_object('pwntalk.config')
+app.init_logging()
 
 # CTF Flags
 flags = {
